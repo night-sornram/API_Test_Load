@@ -11,12 +11,7 @@ import (
 	"strings"
 )
 
-type Response struct {
-	Error string `json:"error"`
-	Name  string `json:"name"`
-}
-
-func GetPhone(c *fiber.Ctx) (err error) {
+func GetDefaultPhone(c *fiber.Ctx) (err error) {
 	id := c.Params("id")
 
 	url := fmt.Sprintf("http://localhost:8081/phone?number=%s", id)
