@@ -1,4 +1,4 @@
-package handle
+package http2
 
 import (
 	"encoding/json"
@@ -14,7 +14,7 @@ import (
 func GetFastHTTPPhone(c *fiber.Ctx) (err error) {
 	id := c.Params("id")
 
-	url := fmt.Sprintf("http://localhost:8081/phone?number=%s", id)
+	url := fmt.Sprintf("http://localhost:8082/phone?number=%s", id)
 
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()

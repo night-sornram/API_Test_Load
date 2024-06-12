@@ -1,4 +1,4 @@
-package handle
+package gRPC
 
 import (
 	"encoding/json"
@@ -14,7 +14,7 @@ import (
 func GetDefaultPhone(c *fiber.Ctx) (err error) {
 	id := c.Params("id")
 
-	url := fmt.Sprintf("http://localhost:8081/phone?number=%s", id)
+	url := fmt.Sprintf("http://localhost:8083/phone?number=%s", id)
 
 	response, err := http.Get(url)
 
