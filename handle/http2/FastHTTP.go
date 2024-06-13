@@ -5,10 +5,8 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/valyala/fasthttp"
-	"net"
 	"os"
 	"strings"
-	"time"
 )
 
 func GetFastHTTPPhone(c *fiber.Ctx) (err error) {
@@ -25,9 +23,6 @@ func GetFastHTTPPhone(c *fiber.Ctx) (err error) {
 
 	client := &fasthttp.Client{
 		MaxConnsPerHost: 2000,
-		Dial: func(addr string) (net.Conn, error) {
-			return fasthttp.DialTimeout(addr, time.Second*5)
-		},
 	}
 
 	err = client.Do(req, resp)

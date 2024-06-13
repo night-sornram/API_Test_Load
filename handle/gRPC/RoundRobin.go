@@ -1,61 +1,48 @@
 package gRPC
 
 import (
-	"encoding/json"
-	"fmt"
+	"apitest/protos"
+	"context"
 	"github.com/gofiber/fiber/v2"
-	"github.com/valyala/fasthttp"
-	"net"
-	"os"
-	"strings"
+	"google.golang.org/grpc"
+	"sync"
 	"time"
 )
 
-var counter = 1
+var connPool []*grpc.ClientConn
+var connPoolMutex sync.Mutex
 
-var serverPool = []string{
-	"http://localhost:8083",
-	"http://localhost:8086",
-	// Add more servers as needed
+func init() {
+	connPool = make([]*grpc.ClientConn, len(serverPool))
 }
 
-func GetRoundRobinPhone(c *fiber.Ctx) (err error) {
+func GetRoundRobinPhone(c *fiber.Ctx) error {
 	id := c.Params("id")
 
-	url := fmt.Sprintf("%s/phone?number=%s", serverPool[counter%2], id)
-
+	connPoolMutex.Lock()
+	conn := connPool[counter%3]
+	if conn == nil {
+		var err error
+		conn, err = grpc.Dial(serverPool[counter%3], grpc.WithInsecure())
+		if err != nil {
+			connPoolMutex.Unlock()
+			return err
+		}
+		connPool[counter%3] = conn
+	}
 	counter++
+	connPoolMutex.Unlock()
 
-	req := fasthttp.AcquireRequest()
-	resp := fasthttp.AcquireResponse()
-	defer fasthttp.ReleaseRequest(req)
-	defer fasthttp.ReleaseResponse(resp)
+	cc := protos.NewLookupServiceClient(conn)
 
-	req.SetRequestURI(url)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-	client := &fasthttp.Client{
-		MaxConnsPerHost: 2000,
-		Dial: func(addr string) (net.Conn, error) {
-			return fasthttp.DialTimeout(addr, time.Second*5)
-		},
-	}
-
-	err = client.Do(req, resp)
-	if err != nil {
-		fmt.Print(err.Error())
-		os.Exit(1)
-	}
-
-	responseData := resp.Body()
-
-	responseDataStr := strings.ReplaceAll(string(responseData), "\r", "")
-
-	content := Response{}
-
-	err = json.Unmarshal([]byte(responseDataStr), &content)
+	req := &protos.LookupReq{PhoneNumber: id}
+	res, err := cc.Lookup(ctx, req)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(content)
+	return c.JSON(res)
 }

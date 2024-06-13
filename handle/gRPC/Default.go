@@ -1,42 +1,28 @@
 package gRPC
 
 import (
-	"encoding/json"
-	"fmt"
+	"apitest/protos"
+	"context"
 	"github.com/gofiber/fiber/v2"
-	"io/ioutil"
+	"google.golang.org/grpc"
 	"log"
-	"net/http"
-	"os"
-	"strings"
 )
 
 func GetDefaultPhone(c *fiber.Ctx) (err error) {
 	id := c.Params("id")
-
-	url := fmt.Sprintf("http://localhost:8083/phone?number=%s", id)
-
-	response, err := http.Get(url)
-
+	conn, err := grpc.Dial("localhost:8083", grpc.WithInsecure())
 	if err != nil {
-		fmt.Print(err.Error())
-		os.Exit(1)
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	cc := protos.NewLookupServiceClient(conn)
+
+	req := &protos.LookupReq{PhoneNumber: id}
+	res, err := cc.Lookup(context.Background(), req)
+	if err != nil {
+		log.Fatalf("could not lookup: %v", err)
 	}
 
-	responseData, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	responseDataStr := strings.ReplaceAll(string(responseData), "\r", "")
-
-	content := Response{}
-
-	err = json.Unmarshal([]byte(responseDataStr), &content)
-	if err != nil {
-		return err
-	}
-
-	return c.JSON(content)
+	return c.JSON(res)
 
 }

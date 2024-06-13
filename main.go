@@ -23,9 +23,7 @@ func main() {
 	app.Get("/http2/fasthttpgoroutine/phone/:id", http2.GetFastHTTPPGoroutinePhone)
 
 	app.Get("/grpc/default/phone/:id", gRPC.GetDefaultPhone)
-	app.Get("/grpc/fasthttp/phone/:id", gRPC.GetFastHTTPPhone)
 	app.Get("/grpc/roundrobin/phone/:id", gRPC.GetRoundRobinPhone)
-	app.Get("/grpc/fasthttpgoroutine/phone/:id", gRPC.GetFastHTTPPGoroutinePhone)
 
 	err := app.Listen(":3000")
 	if err != nil {

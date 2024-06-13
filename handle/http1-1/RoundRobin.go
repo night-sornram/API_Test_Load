@@ -4,49 +4,40 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"github.com/valyala/fasthttp"
-	"net"
+	"io/ioutil"
+	"log"
+	"net/http"
 	"os"
 	"strings"
-	"time"
 )
 
 var counter = 1
 
 var serverPool = []string{
 	"http://localhost:8081",
-	"http://localhost:8082",
+	"http://localhost:8084",
+	"http://localhost:8087",
 	// Add more servers as needed
 }
 
 func GetRoundRobinPhone(c *fiber.Ctx) (err error) {
 	id := c.Params("id")
 
-	url := fmt.Sprintf("%s/phone?number=%s", serverPool[counter%2], id)
+	url := fmt.Sprintf("%s/phone?number=%s", serverPool[counter%3], id)
 
 	counter++
 
-	req := fasthttp.AcquireRequest()
-	resp := fasthttp.AcquireResponse()
-	defer fasthttp.ReleaseRequest(req)
-	defer fasthttp.ReleaseResponse(resp)
+	response, err := http.Get(url)
 
-	req.SetRequestURI(url)
-
-	client := &fasthttp.Client{
-		MaxConnsPerHost: 2000,
-		Dial: func(addr string) (net.Conn, error) {
-			return fasthttp.DialTimeout(addr, time.Second*5)
-		},
-	}
-
-	err = client.Do(req, resp)
 	if err != nil {
 		fmt.Print(err.Error())
 		os.Exit(1)
 	}
 
-	responseData := resp.Body()
+	responseData, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	responseDataStr := strings.ReplaceAll(string(responseData), "\r", "")
 
