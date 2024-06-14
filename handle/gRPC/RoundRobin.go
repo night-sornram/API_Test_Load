@@ -35,7 +35,7 @@ func GetRoundRobinPhone(c *fiber.Ctx) error {
 
 	cc := protos.NewLookupServiceClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 3300*time.Millisecond)
 	defer cancel()
 
 	req := &protos.LookupReq{PhoneNumber: id}
