@@ -1,13 +1,22 @@
-package gRPC
+package main
 
 import (
 	"apitest/protos"
 	"context"
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
+	"log"
 	"sync"
 	"time"
 )
+
+var counter = 1
+
+var serverPool = []string{
+	"localhost:8083",
+	"localhost:8086",
+	"localhost:8089",
+}
 
 var connPool []*grpc.ClientConn
 var connPoolMutex sync.Mutex
@@ -16,8 +25,20 @@ func init() {
 	connPool = make([]*grpc.ClientConn, len(serverPool))
 }
 
-func GetRoundRobinPhone(c *fiber.Ctx) error {
-	id := c.Params("id")
+func main() {
+	r := gin.Default()
+
+	gRPCGroup := r.Group("/grpc")
+	gRPCGroup.GET("/roundrobin/phone/:id", getRoundRobinPhone)
+
+	err := r.Run(":4000")
+	if err != nil {
+		log.Fatalf("Failed to start the server: %v", err)
+	}
+}
+
+func getRoundRobinPhone(c *gin.Context) {
+	id := c.Param("id")
 
 	connPoolMutex.Lock()
 	conn := connPool[counter%3]
@@ -26,7 +47,8 @@ func GetRoundRobinPhone(c *fiber.Ctx) error {
 		conn, err = grpc.Dial(serverPool[counter%3], grpc.WithInsecure())
 		if err != nil {
 			connPoolMutex.Unlock()
-			return err
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
 		}
 		connPool[counter%3] = conn
 	}
@@ -41,8 +63,9 @@ func GetRoundRobinPhone(c *fiber.Ctx) error {
 	req := &protos.LookupReq{PhoneNumber: id}
 	res, err := cc.Lookup(ctx, req)
 	if err != nil {
-		return err
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
 	}
 
-	return c.JSON(res)
+	c.JSON(200, res)
 }

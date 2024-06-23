@@ -5,26 +5,28 @@ import (
 	"apitest/handle/http1-1"
 	"apitest/handle/http2"
 	"github.com/gofiber/fiber/v2"
+	"log"
 )
-
-var Counter int
 
 func main() {
 	app := fiber.New()
 
-	app.Get("/http1-1/default/phone/:id", http1_1.GetDefaultPhone)
-	app.Get("/http1-1/fasthttp/phone/:id", http1_1.GetFastHTTPPhone)
-	app.Get("/http1-1/roundrobin/phone/:id", http1_1.GetRoundRobinPhone)
+	http1_1Group := app.Group("/http1-1")
+	http1_1Group.Get("/default/phone/:id", http1_1.GetDefaultPhone)
+	http1_1Group.Get("/fasthttp/phone/:id", http1_1.GetFastHTTPPhone)
+	http1_1Group.Get("/roundrobin/phone/:id", http1_1.GetRoundRobinPhone)
 
-	app.Get("/http2/default/phone/:id", http2.GetDefaultPhone)
-	app.Get("/http2/fasthttp/phone/:id", http2.GetFastHTTPPhone)
-	app.Get("/http2/roundrobin/phone/:id", http2.GetRoundRobinPhone)
+	http2Group := app.Group("/http2")
+	http2Group.Get("/default/phone/:id", http2.GetDefaultPhone)
+	http2Group.Get("/fasthttp/phone/:id", http2.GetFastHTTPPhone)
+	http2Group.Get("/roundrobin/phone/:id", http2.GetRoundRobinPhone)
 
-	app.Get("/grpc/default/phone/:id", gRPC.GetDefaultPhone)
-	app.Get("/grpc/roundrobin/phone/:id", gRPC.GetRoundRobinPhone)
+	gRPCGroup := app.Group("/grpc")
+	gRPCGroup.Get("/default/phone/:id", gRPC.GetDefaultPhone)
+	gRPCGroup.Get("/roundrobin/phone/:id", gRPC.GetRoundRobinPhone)
 
 	err := app.Listen(":3000")
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to start the server: %v", err)
 	}
 }
