@@ -15,9 +15,9 @@ var counter = 1
 var client = &http.Client{} // Reuse HTTP client
 
 var serverPool = []string{
-	"http://localhost:8081",
-	"http://localhost:8084",
-	"http://localhost:8087",
+	"http://localhost:8011",
+	"http://localhost:8012",
+	"http://localhost:8013",
 	// Add more servers as needed
 }
 
@@ -28,12 +28,17 @@ func GetRoundRobinPhone(c *fiber.Ctx) (err error) {
 
 	counter++
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3300*time.Millisecond)
-	defer cancel()
+	client := http.Client{
+		Timeout: 8 * time.Second,
+	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	response, err := client.Get(url)
 	if err != nil {
-		return err
+		fmt.Println(err.Error())
+		if response != nil {
+			return c.SendStatus(fiber.StatusServiceUnavailable)
+		}
+		return c.SendStatus(fiber.StatusRequestTimeout)
 	}
 
 	response, err := client.Do(req)
