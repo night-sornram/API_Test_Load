@@ -1,23 +1,23 @@
 package http2
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 	"time"
 )
 
 var counter = 1
+var client = &http.Client{} // Reuse HTTP client
 
 var serverPool = []string{
 	"http://localhost:8021",
 	"http://localhost:8022",
 	"http://localhost:8023",
-
 	// Add more servers as needed
 }
 
@@ -33,22 +33,22 @@ func GetRoundRobinPhone(c *fiber.Ctx) (err error) {
 	}
 
 	response, err := client.Get(url)
-
+  
 	if err != nil {
 		fmt.Println(err.Error())
 		return c.SendStatus(fiber.StatusRequestTimeout)
 	}
 
-	responseData, err := ioutil.ReadAll(response.Body)
+	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	responseDataStr := strings.ReplaceAll(string(responseData), "\r", "")
+	bodyStr := strings.ReplaceAll(string(body), "\r", "")
+	body = []byte(bodyStr)
 
 	content := Response{}
-
-	err = json.Unmarshal([]byte(responseDataStr), &content)
+	err = json.Unmarshal(body, &content)
 	if err != nil {
 		return err
 	}
