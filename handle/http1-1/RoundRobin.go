@@ -7,16 +7,16 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"strings"
+	"time"
 )
 
 var counter = 1
 
 var serverPool = []string{
-	"http://localhost:8081",
-	"http://localhost:8084",
-	"http://localhost:8087",
+	"http://localhost:8011",
+	"http://localhost:8012",
+	"http://localhost:8013",
 	// Add more servers as needed
 }
 
@@ -27,11 +27,18 @@ func GetRoundRobinPhone(c *fiber.Ctx) (err error) {
 
 	counter++
 
-	response, err := http.Get(url)
+	client := http.Client{
+		Timeout: 8 * time.Second,
+	}
+
+	response, err := client.Get(url)
 
 	if err != nil {
-		fmt.Print(err.Error())
-		os.Exit(1)
+		fmt.Println(err.Error())
+		if response != nil {
+			return c.SendStatus(fiber.StatusServiceUnavailable)
+		}
+		return c.SendStatus(fiber.StatusRequestTimeout)
 	}
 
 	responseData, err := ioutil.ReadAll(response.Body)

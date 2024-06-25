@@ -5,10 +5,10 @@ type Response struct {
 	Name  string `json:"name"`
 }
 
-var counter = 1
+var counter = 0
 
 var serverPool = []string{
-	"localhost:8083",
-	"localhost:8086",
-	"localhost:8089",
+	"localhost:8031",
+	"localhost:8032",
+	"localhost:8033",
 }

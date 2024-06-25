@@ -7,20 +7,24 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"strings"
+	"time"
 )
 
 func GetDefaultPhone(c *fiber.Ctx) (err error) {
 	id := c.Params("id")
 
-	url := fmt.Sprintf("http://localhost:8082/phone?number=%s", id)
+	url := fmt.Sprintf("http://localhost:8021/phone?number=%s", id)
 
-	response, err := http.Get(url)
+	client := http.Client{
+		Timeout: 6 * time.Second,
+	}
+
+	response, err := client.Get(url)
 
 	if err != nil {
-		fmt.Print(err.Error())
-		os.Exit(1)
+		fmt.Println(err.Error())
+		return c.SendStatus(fiber.StatusRequestTimeout)
 	}
 
 	responseData, err := ioutil.ReadAll(response.Body)
