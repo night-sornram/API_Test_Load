@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"time"
 )
 
 func GetDefaultPhone(r *rate.Limiter) fiber.Handler {
@@ -20,17 +19,13 @@ func GetDefaultPhone(r *rate.Limiter) fiber.Handler {
 
 		id := c.Params("id")
 
-		url := fmt.Sprintf("http://localhost:8011/phone?number=%s", id)
+		url := fmt.Sprintf("http://mock-lookup:8011/phone?number=%s", id)
 
-		client := http.Client{
-			Timeout: 6 * time.Second,
-		}
-
-		response, err := client.Get(url)
+		response, err := http.Get(url)
 
 		if err != nil {
-			//fmt.Println(err.Error())
-			return c.SendStatus(fiber.StatusRequestTimeout)
+			fmt.Println(err.Error())
+			return c.Status(fiber.StatusRequestTimeout).JSON(err.Error())
 		}
 
 		responseData, err := ioutil.ReadAll(response.Body)

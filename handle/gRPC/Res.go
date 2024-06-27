@@ -8,7 +8,7 @@ type Response struct {
 var counter = 0
 
 var serverPool = []string{
-	"localhost:8031",
-	"localhost:8032",
-	"localhost:8033",
+	"mock-lookup:8031",
+	"mock-lookup:8032",
+	"mock-lookup:8033",
 }

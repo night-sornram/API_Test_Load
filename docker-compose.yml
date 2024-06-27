@@ -1,0 +1,58 @@
+version: "3.8"
+services:
+  main.dockerfile :
+    build:
+      context: ./
+      dockerfile: main.dockerfile
+    container_name: main
+    restart: always
+    ports:
+      - "3000:3000"
+    cpuset: "0-1"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256m
+        reservations:
+          cpus: '0.1'
+          memory: 25m
+    networks:
+      my-network:
+        aliases:
+          - main
+  mock-lookup.dockerfile :
+    build:
+      context: ./mock-lookup
+      dockerfile: mock-lookup.dockerfile
+    container_name: mock-lookup
+    restart: always
+    ports:
+      - "8011:8011"
+      - "8012:8012"
+      - "8013:8013"
+      - "8021:8021"
+      - "8022:8022"
+      - "8023:8023"
+      - "8031:3131"
+      - "8032:8332"
+      - "8033:8333"
+      - "8034:8334"
+      - "8035:8335"
+    cpuset: "2-3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256m
+        reservations:
+          cpus: '0.1'
+          memory: 25m
+    networks:
+      my-network:
+        aliases:
+          - mock-lookup
+
+networks:
+  my-network:
+    driver: bridge
