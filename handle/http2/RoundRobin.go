@@ -14,9 +14,9 @@ import (
 var counter = 1
 
 var serverPool = []string{
-	"http://localhost:8021",
-	"http://localhost:8022",
-	"http://localhost:8023",
+	"http://mock-lookup:8021",
+	"http://mock-lookup:8022",
+	"http://mock-lookup:8023",
 
 	// Add more servers as needed
 }

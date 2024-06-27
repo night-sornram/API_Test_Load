@@ -19,13 +19,13 @@ func GetDefaultPhone(r *rate.Limiter) fiber.Handler {
 
 		id := c.Params("id")
 
-		url := fmt.Sprintf("http://localhost:8011/phone?number=%s", id)
+		url := fmt.Sprintf("http://mock-lookup:8011/phone?number=%s", id)
 
 		response, err := http.Get(url)
 
 		if err != nil {
 			fmt.Println(err.Error())
-			return c.SendStatus(fiber.StatusRequestTimeout)
+			return c.Status(fiber.StatusRequestTimeout).JSON(err.Error())
 		}
 
 		responseData, err := ioutil.ReadAll(response.Body)

@@ -8,6 +8,15 @@ services:
     restart: always
     ports:
       - "3000:3000"
+    cpuset: "0-1"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256m
+        reservations:
+          cpus: '0.1'
+          memory: 25m
     networks:
       my-network:
         aliases:
@@ -30,6 +39,15 @@ services:
       - "8033:8333"
       - "8034:8334"
       - "8035:8335"
+    cpuset: "2-3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256m
+        reservations:
+          cpus: '0.1'
+          memory: 25m
     networks:
       my-network:
         aliases:

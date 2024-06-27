@@ -16,7 +16,7 @@ func GetDefaultPhone(r *rate.Limiter) fiber.Handler {
 		}
 
 		id := c.Params("id")
-		conn, err := grpc.Dial("localhost:8031", grpc.WithInsecure())
+		conn, err := grpc.Dial("mock-lookup:8031", grpc.WithInsecure())
 		if err != nil {
 			log.Fatalf("did not connect: %v", err)
 		}

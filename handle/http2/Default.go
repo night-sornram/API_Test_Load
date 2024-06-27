@@ -14,7 +14,7 @@ import (
 func GetDefaultPhone(c *fiber.Ctx) (err error) {
 	id := c.Params("id")
 
-	url := fmt.Sprintf("http://localhost:8021/phone?number=%s", id)
+	url := fmt.Sprintf("http://mock-lookup:8021/phone?number=%s", id)
 
 	client := http.Client{
 		Timeout: 6 * time.Second,
