@@ -17,5 +17,5 @@ export default function () {
     check(res, { 'status was 429': (r) => r.status == 429 });
     check(res, { 'status was 408': (r) => r.status == 408 });
     check(res, { 'status was 0': (r) => r.status == 0 });
-    sleep(2);
+    sleep(1);
 }

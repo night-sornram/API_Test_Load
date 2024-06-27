@@ -46,8 +46,8 @@ func GetRoundRobinPhone(r *rate.Limiter) fiber.Handler {
 
 		cc := protos.NewLookupServiceClient(conn)
 
-		callCtx, callCancel := context.WithTimeout(context.Background(), totalTimeout)
-		defer callCancel()
+	ctx, cancel := context.WithTimeout(context.Background(), 3200*time.Millisecond)
+	defer cancel()
 
 		req := &protos.LookupReq{PhoneNumber: id}
 		res, err := cc.Lookup(callCtx, req)

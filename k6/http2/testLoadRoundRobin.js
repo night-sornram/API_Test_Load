@@ -2,8 +2,8 @@ import http from "k6/http"
 import {check, sleep} from "k6"
 
 export const options = {
-    vus: 1500,
-    duration: '15s',
+    vus: 3000,
+    duration: '10s',
 }
 
 
