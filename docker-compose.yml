@@ -12,11 +12,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
-          memory: 256m
+          cpus: '2.4'
+          memory: 512m
         reservations:
-          cpus: '0.1'
-          memory: 25m
+          cpus: '1'
+          memory: 256m
     networks:
       my-network:
         aliases:
@@ -43,11 +43,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
-          memory: 256m
+          cpus: '2.4'
+          memory: 512m
         reservations:
-          cpus: '0.1'
-          memory: 25m
+          cpus: '1'
+          memory: 256m
     networks:
       my-network:
         aliases:
